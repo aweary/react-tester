@@ -36,22 +36,14 @@ export default class Traversal {
 
   find(nodeType: string | Function | Object): NodeArray {
     /**
-     * We support four potential scenarios for matching nodes:
-     * 
-     * 1. a string attempting to match a host node ('host')
-     * 2. a string attempting to match a composite node ('Foo')
-     * 3. a function attempting to match a composite node (Foo)
-     * 
-     * This flag tells us whether we should coerce node.type to a string
-     * so that case 2 works.
+     * If the nodeType is a string we just treat it as a CSS
+     * selector. Since even simple finds like find('li') can
+     * be treated as a CSS selector this makes it so we dont
+     * have to actually check if its a CSS selector or not.
      */
-    const coerceCompositeTypeToString = isString(nodeType)
-    return this.findWhere(type => {
-      if (coerceCompositeTypeToString) {
-        type = getTypeName(type)
-      }
-      return type === nodeType
-    })
+    return isString(nodeType)
+      ? this.findBySelector(nodeType)
+      : this.findWhere(type => type === nodeType)
   }
 
   // @TODO: type this

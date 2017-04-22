@@ -6,6 +6,7 @@ import {
   hasClass,
   isString,
   isHostOrComposite,
+  getTypeName,
 } from './utilities'
 import prettyFormat from 'pretty-format'
 import NodeArray from './NodeArray'
@@ -53,7 +54,7 @@ function nodeMatchesToken(node: ReactTreeNode, token) {
      * @example 'div' matches <div />
      */
     case TYPE_SELECTOR:
-      return node.type === token.name
+      return getTypeName(node.type) === token.name
     /**
      * Match against the className prop
      * @example '.active' matches <div className='active' />
