@@ -12,7 +12,12 @@ export function isHostOrComposite(x: any): boolean %checks {
 }
 
 export function isHostOrCompositeWithChildren(x: any): boolean %checks {
-  return x !== null && !isString(x) && typeof x === 'object' && Array.isArray(x.rendered)
+  return (
+    x !== null &&
+    !isString(x) &&
+    typeof x === 'object' &&
+    Array.isArray(x.rendered)
+  )
 }
 
 export function isArray(x: any): boolean %checks {
