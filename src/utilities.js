@@ -2,6 +2,13 @@
 import _ from 'lodash'
 import ReactTreeNodeArray from './NodeArray'
 import type { ReactTreeNode } from './types'
+import {
+  HostRoot,
+  ClassComponent,
+  FunctionalComponent,
+  HostComponent,
+  HostText,
+} from './work'
 
 export function isString(x: any): boolean %checks {
   return typeof x === 'string'
@@ -95,4 +102,57 @@ export function hasClass(targetClassName: string, { className }: Object) {
   if (!className) return false
   const classList = className.split(' ')
   return classList.indexOf(targetClassName) !== -1
+}
+
+function nodeAndSiblingsArray(nodeWithSibling) {
+  var array = [];
+  var node = nodeWithSibling;
+  while (node != null) {
+    array.push(node);
+    node = node.sibling;
+  }
+  return array;
+}
+
+/**
+ * Used by the DOM renderer to convert the _reactInternalInstance
+ * to the same tree structure that toTree returns
+ * @param {*} root 
+ */
+export function toTree(node) {
+  if (node == null) {
+    return null
+  }
+  switch (node.tag) {
+    case HostRoot: // 3
+      return toTree(node.child)
+    case ClassComponent:
+      return {
+        nodeType: 'component',
+        type: node.type,
+        props: Object.assign({}, node.memoizedProps),
+        instance: node.stateNode,
+        rendered: toTree(node.child),
+      }
+    case FunctionalComponent: // 1
+      return {
+        nodeType: 'component',
+        type: node.type,
+        props: Object.assign({}, node.memoizedProps),
+        instance: null,
+        rendered: toTree(node.child),
+      }
+    case HostComponent: // 5
+      return {
+        nodeType: 'host',
+        type: node.type,
+        props: Object.assign({}, node.memoizedProps),
+        instance: null,
+        rendered: nodeAndSiblingsArray(node.child).map(toTree),
+      }
+    case HostText: // 6
+      return node.stateNode.text
+    default:
+      throw new Error(`toTree() does not yet know how to handle nodes with tag=${node.tag}`)
+  }
 }
