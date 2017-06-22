@@ -69,7 +69,7 @@ export function traverseTree(
   // Return if this root has no rendered children,
   // which is the case for primitive leafs like numbers
   // or strings
-  if (typeof root !== 'string' && root.rendered) {
+  if (typeof root !== 'string' && root && root.rendered) {
     traverseTree(root.rendered, fn, root)
   }
 }
